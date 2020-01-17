@@ -1,0 +1,9 @@
+[credential]
+    helper = store --file /home/nazar/.git-credentials
+[user]
+	email = nazarn96@gmail.com
+	name = Nazar Klovanych
+[init]
+	templatedir = ~/.git_template
+[alias]
+	ctags = !~/.git_template/hooks/ctags
