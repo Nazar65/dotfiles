@@ -1,0 +1,31 @@
+
+Plugin 'gmarik/Vundle.vim'		        " let Vundle manage Vundle, required
+
+"------------------=== Other ===----------------------
+
+Plugin 'majutsushi/tagbar'          	" Class/module browser
+Plugin 'vim-airline/vim-airline'        " Vim status bar
+Plugin 'fisadev/FixedTaskList.vim'  	" Pending tasks list
+Plugin 'rosenfeld/conque-term'      	" Consoles as buffers
+Plugin 'tpope/vim-surround'	   	        " Parentheses, brackets, quotes, XML tags, and more
+Plugin 'tpope/vim-fugitive'             " Git branches
+Plugin 'vim-vdebug/vdebug'              " Debugger php phyton
+Plugin 'junegunn/fzf'                   " Quick search files
+Plugin 'junegunn/fzf.vim'               " Quick search in files
+Plugin 'vim-scripts/vim-auto-save'      " Auto Save for vim
+
+"--------------=== Snippets support ===---------------
+"
+Plugin 'garbas/vim-snipmate'		    " Snippets manager
+Plugin 'MarcWeber/vim-addon-mw-utils'	" dependencies #1
+Plugin 'tomtom/tlib_vim'		        " dependencies #2
+Plugin 'honza/vim-snippets'		        " snippets repo
+Plugin 'stephpy/vim-php-cs-fixer'       " Php auto Fromat
+
+"---------------=== Languages support ===-------------
+" --- Python ---
+Plugin 'klen/python-mode'	            " Python mode (docs, refactor, lints, highlighting, run and ipdb and more)
+Plugin 'davidhalter/jedi-vim' 		    " Jedi-vim autocomplete plugin
+Plugin 'mitsuhiko/vim-jinja'		    " Jinja support for vim
+Plugin 'mitsuhiko/vim-python-combined'  " Combined Python 2/3 for Vim
+
