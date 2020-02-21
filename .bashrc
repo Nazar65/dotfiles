@@ -21,7 +21,7 @@ alias php='/usr/bin/php72'
 alias switch-monitor='sh ~/.monitors.sh'
 alias toggle-monitor='sh ~/.toggle-monitor.sh'
 alias ls='ls --color=auto'
-
+alias emacs='emacs -nw'
 ######## Magento instance install command ##############################
 
 alias install-madobe24dev="php72 bin/magento setup:install --base-url=http://madobe24dev.vg --base-url-secure=https://madobe24dev.vg --use-secure-admin=1 --use-secure=1 --use-rewrites=1 --admin-use-security-key=0   --db-host=localhost --db-name=madobe24dev --db-user=root --backend-frontname=admin  --db-password=3r5465XNlika21 --admin-firstname=Magento --admin-lastname=User --admin-email=user@example.com --admin-user=admin --admin-password=123123q --language=en_US";
@@ -127,5 +127,4 @@ export PS1="\n$sq_color\342\224\214\342\224\200\$([[ \$? != 0 ]] && echo \"[$BRe
 
 unset sq_color
 
-#export FZF_DEFAULT_OPTS='--preview "bat --style=numbers --color=always {} | head -500"'
 alias config='/usr/bin/git --git-dir=/home/nazar/dotfiles --work-tree=/home/nazar'
