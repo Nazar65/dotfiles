@@ -51,7 +51,7 @@ set timeoutlen=1000
 set ttimeoutlen=0
 " end
 
-command! -nargs=1 SetPhpUnitConfig call phpTests#togglePhpUnitConfig(<f-args>)
+command! -nargs=* SetPhpUnitConfig call phpTests#togglePhpUnitConfig(<f-args>)
 
 set backspace=indent,eol,start
 aunmenu Help.
@@ -89,6 +89,10 @@ map <C-a> :Bufonly<CR>                    " Close all active bufers levae active
 if has('unnamedplus')
     set clipboard=unnamed,unnamedplus
 endif
+
+" phpUnitConfig
+let g:phpUnitBinFile = '/Projects/magento24dev/vendor/bin/phpunit'
+let g:phpTestUnitDist = '/Projects/magento24dev/dev/tests/static/phpunit.xml.dist'
 
 augroup vimrc_autocmds
     autocmd!
