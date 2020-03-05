@@ -2,9 +2,7 @@
 " Version 1.0
 "
 "/
-if v:version < 800
-    finish
-endif
+
 if !exists('g:phpTestType')
     let g:phpTestType = $HOME . g:phpTestUnitDist 
 endif
@@ -20,9 +18,10 @@ function! phpTests#setConfigOptions()
       \ 'CommandLeader': '<leader>',
       \ 'Interpreter': '/usr/bin/php72',
       \ 'PHPUnit': g:phpUnit,
+      \ 'PHPUnitXml': '-c ' . g:phpTestType . ' ' ,
       \ 'Target': '' ,
       \ 'Environment': '',
-      \ 'OutputFormat': '--teamcity -c ' . g:phpTestType,
+      \ 'OutputFormat': '--teamcity', 
       \ 'Shell': '',
       \ 'LocalRoot': '',
       \ 'RemoteRoot': '',
@@ -54,7 +53,7 @@ function! phpTests#open()
   endif
 
   if bufwinnr(g:testOutputBufferName) == -1
-    sb! +wincmd\ J|res\ 10 TestOutput
+    sb! +wincmd\ J|res\ 25 TestOutput
     normal G
   endif
 endfunction
@@ -476,7 +475,7 @@ function! phpTests#startFiltered(filter)
     let l:shell = ''
   endif
 
-  let l:command = l:shell . ' ' . l:environment . ' ' . g:phpTestsOptions['Interpreter'] . ' ' . g:phpTestsOptions['PHPUnit'] . ' ' . g:phpTestsOptions['OutputFormat'] . ' ' . a:filter
+  let l:command = l:shell . ' ' . l:environment . ' ' . g:phpTestsOptions['Interpreter'] . ' ' . g:phpTestsOptions['PHPUnit'] . ' ' . g:phpTestsOptions['PHPUnitXml'] . ' ' . a:filter . ' ' . g:phpTestsOptions['OutputFormat']        
   let s:indent = 0
 
   " Open a 10 line window and move it to the bottom
