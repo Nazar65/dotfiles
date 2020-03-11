@@ -1,88 +1,161 @@
+; -*- lexical-binding: t; -*-
+;; Speed up startup
+(setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
+
+(setq file-name-handler-alist nil)
+
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
+
+(customize-set-variable 'package-archives
+                        `(,@package-archives
+                          ("melpa" . "https://melpa.org/packages/")
+                          ;; ("marmalade" . "https://marmalade-repo.org/packages/")
+                          ("org" . "https://orgmode.org/elpa/")
+                          ;; ("user42" . "https://download.tuxfamily.org/user42/elpa/packages/")
+                          ;; ("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/")
+                          ;; ("sunrise" . "http://joseito.republika.pl/sunrise-commander/")
+                          ))
+(setq package-enable-at-startup nil)
+
+(setq frame-inhibit-implied-resize t)
+
 (package-initialize)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("e1ecb0536abec692b5a5e845067d75273fe36f24d01210bf0aa5842f2a7e029f" default)))
- '(package-selected-packages
-   (quote
-    (ag dired-sidebar peep-dired dired-hacks-utils helm-org-rifle helm-swoop helm-describe-modes helm-projectile helm-ag helm-descbinds helm projectile company-php doom-themes ac-php php-mode use-package))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-(use-package php-mode :ensure t)
-(unless (package-installed-p 'ac-php)
-    (package-refresh-contents)
-    (package-install 'ac-php))
-(require 'php-mode)
-(add-hook 'php-mode-hook
-          '(lambda ()
-             ;; Enable company-mode
-             (company-mode t)
-             (require 'company-php)
 
-             ;; Enable ElDoc support (optional)
-             (ac-php-core-eldoc-setup)
+(setq-default use-package-always-ensure nil ; Auto-download package if not exists
+              use-package-always-defer nil ; Always defer load package to speed up startup
+              use-package-verbose t ; Don't report loading details
+              use-package-expand-minimally t  ; make the expanded code as minimal as possible
+              use-package-enable-imenu-support t) ; Let imenu finds use-package definitions
 
-             (set (make-local-variable 'company-backends)
-                  '((company-ac-php-backend company-dabbrev-code)
-                    company-capf company-files))
 
-             ;; Jump to definition (optional)
-             (define-key php-mode-map (kbd "M-]")
-               'ac-php-find-symbol-at-point)
+; unless use-package is already installed
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
-             ;; Return back (optional)
-             (define-key php-mode-map (kbd "M-[")
-               'ac-php-location-stack-back)))
-(use-package doom-themes
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-one t)
+(eval-when-compile
+  (require 'use-package))
 
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-  
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  (doom-themes-neotree-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
-  (doom-themes-treemacs-config)
-  
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+(put 'use-package 'lisp-indent-function 1)
 
-; Working with projects
+(use-package use-package-core
+  :custom
+  ;; (use-package-verbose t)
+  ;; (use-package-minimum-reported-time 0.005)
+  (use-package-enable-imenu-support t))
 
-;projectile path to project folders
+; Basics
+; settings for backup, auto save and lock files
+(setq create-lockfiles nil)
+(setq backup-directory-alist '((".*" . "~/.emacs.d/backups/")))
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/backups/" t)))
+
+; store cutomizations in custom.el file
+(setq custom-file "~/.emacs.d/custom.el")
+(when (file-exists-p custom-file) (load custom-file))
+
+;; Define custom variables
 (defvar projectile-project-folder '("~/Projects/"))
-(use-package projectile
+
+(scroll-bar-mode -1)
+(tool-bar-mode   -1)
+(tooltip-mode    -1)
+(menu-bar-mode   -1)
+
+;; Define global keybindings
+(global-unset-key "\C-z")
+(global-set-key "\C-z" 'advertised-undo)
+
+
+;; Custom functions
+;; ===============================================
+
+(defun php-debug ()
+	"Run current PHP script for debugging with geben"
+	(interactive)
+	(call-interactively 'geben))
+
+;; use xclip to copy/paste in emacs-nox
+(unless window-system
+  (when (getenv "DISPLAY")
+    (defun xclip-cut-function (text &optional push)
+      (with-temp-buffer
+	(insert text)
+	(call-process-region (point-min) (point-max) "xclip" nil 0 nil "-i" "-selection" "clipboard")))
+    (defun xclip-paste-function()
+      (let ((xclip-output (shell-command-to-string "xclip -o -selection clipboard")))
+	(unless (string= (car kill-ring) xclip-output)
+	  xclip-output )))
+    (setq interprogram-cut-function 'xclip-cut-function)
+    (setq interprogram-paste-function 'xclip-paste-function)
+    ))
+
+;;Move backups file to another folder
+(setq emacs-persistence-directory 
+  (expand-file-name "var" user-emacs-directory))
+(let ((dir (expand-file-name "backup" emacs-persistence-directory)))
+  (unless (file-directory-p dir)
+    (make-directory dir t))
+  (setq backup-directory-alist `(("." . ,dir))))
+
+(let ((backup-dir (concat emacs-persistence-directory "tramp-backup/")))
+  (setq tramp-persistency-file-name (concat emacs-persistence-directory
+                                            "tramp")
+        tramp-backup-directory-alist `(("." . ,backup-dir))
+        tramp-auto-save-directory (concat emacs-persistence-directory
+                                          "tramp-auto-save/"))
+  (dolist (d (list tramp-auto-save-directory backup-dir))
+    (unless (file-exists-p d)
+      (make-directory d t))))
+
+
+;; System packages
+;; ===============================================
+
+; Enforce a sneaky Garbage Collection strategy 
+; to minimize GC interference with the activity.
+(use-package gcmh
 	:ensure t
-	:after helm
+	:diminish
+	:init
+		(gcmh-mode 1))
+
+(use-package system-packages
+	:ensure t
+	:custom
+		(system-packages-noconfirm t))
+
+(use-package use-package-ensure-system-package :ensure t)
+
+; Hide minor modes in modeline
+(use-package diminish :ensure t :defer 0.1)
+
+; Make bindings that stick around.
+(use-package hydra :ensure t :defer 0.1)
+
+; Treat undo history as a tree
+(use-package undo-tree
+	:ensure t
+	:defer 0.1
+	:diminish
 	:config
-		(setq projectile-enable-caching nil
-			  projectile-project-search-path projectile-project-folder
-			  projectile-globally-ignored-file-suffixes '("#" "~" ".swp" ".o" ".so" ".pyc" ".jar" "*.class")
-			  projectile-globally-ignored-directories '(".git" "node_modules" "__pycache__" ".mypy_cache")
-			  projectile-globally-ignored-files '("TAGS" "tags" ".DS_Store" "GTAGS")
-			  projectile-mode-line-prefix " - "
-			  projectile-tags-command "ctags -R -e --languages=php --fields=afiklmnst --file-scope=yes --format=2"
-		)
-		
-		(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-		(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-		(projectile-global-mode 1))
+		(global-set-key (kbd "C-?") 'undo-tree-redo))
+
+; The long lost Emacs string manipulation library.
+(use-package s
+	:demand
+	:ensure t)
+
+; Modern API for working with files and directories
+(use-package f
+	:demand
+	:ensure t)
+
+; A modern list library for Emacs
+(use-package dash
+	:demand
+	:ensure t)
+
 ;; HELM - Emacs incremental completion and selection narrowing framework
 ; ----------
 (use-package helm
@@ -134,8 +207,7 @@
 	:defer t
 	:after helm
 	:diminish
-	:hook
-		(projectile-mode . helm-projectile-on)
+	:hook (projectile-mode . helm-projectile-on)
 	:commands helm-projectile
 	:config
 	(helm-projectile-on))
@@ -148,19 +220,41 @@
 	:config
 		(global-set-key [remap describe-mode] #'helm-describe-modes))
 
-; Efficiently hopping squeezed lines powered by Emacs helm interface
-(use-package helm-swoop
+;; Projectile mode and extensions
+(use-package projectile
 	:ensure t
-	:defer 0.2
 	:after helm
 	:config
-	; need to setup
-)
+		(setq projectile-enable-caching nil
+			  projectile-project-search-path projectile-project-folder
+			  projectile-globally-ignored-file-suffixes '("#" "~" ".swp" ".o" ".so" ".pyc" ".jar" "*.class")
+			  projectile-globally-ignored-directories '(".git" "node_modules" "__pycache__" ".mypy_cache")
+			  projectile-globally-ignored-files '("TAGS" "tags" ".DS_Store" "GTAGS")
+			  projectile-mode-line-prefix " - "
+			  projectile-tags-command "ctags -R -e --languages=php --fields=afiklmnst --file-scope=yes --format=2"
+		)
+		
+		(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
+		(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+		(projectile-global-mode 1))
 
-;Rifle through your Org-mode buffers and acquire your target
-(use-package helm-org-rifle
+
+;; Editor extensions
+(use-package crux
 	:ensure t
-	:after org)
+	:defer 0.5
+	:diminish
+	:config
+		(global-set-key (kbd "C-k") 'crux-smart-kill-line)
+		(global-set-key (kbd "C-M-RET") 'crux-smart-open-line-above) ; need to check
+		(global-set-key (kbd "M-RET") 'crux-smart-open-line)
+		(global-set-key (kbd "C-x 4 t") 'crux-transpose-windows)
+		(global-set-key (kbd "C-c d") 'crux-duplicate-current-line-or-region)
+		(global-set-key (kbd "C-c M-d") 'crux-duplicate-and-comment-current-line-or-region)
+		(global-set-key (kbd "C-c R") 'crux-rename-file-and-buffer)
+		(global-set-key (kbd "C-c I") 'crux-find-user-init-file)
+	  )
+
 
 ;; Dired extensions and utils
 ; ----------
@@ -188,10 +282,96 @@
 		(setq dired-sidebar-width 38)
 		(setq dired-sidebar-theme 'nerd))
 
-;; Disabling things
-;;-----------------------------------------------------------------------
-(menu-bar-mode -1) 
-(toggle-scroll-bar -1) 
-(tool-bar-mode -1) 
-(global-unset-key "\C-z")
-(global-set-key "\C-z" 'advertised-undo)
+
+;; Global customizations
+;; ===============================================
+(use-package doom-themes
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-one t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  
+  ;; Enable custom neotree theme (all-the-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; or for treemacs users
+  (setq doom-themes-treemacs-theme "doom-one") ; use the colorful treemacs theme
+  (doom-themes-treemacs-config)
+  
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+
+(use-package powerline
+  :ensure t
+  :config
+  (powerline-default-theme))
+
+;; Global programming packages
+;; ===============================================
+(use-package company
+  :ensure t
+  :config
+  (global-company-mode t))
+
+(use-package company-php
+  :ensure t
+  :after company)
+
+(use-package php-cs-fixer
+	:ensure t
+	:after php-mode
+	:config
+	;; Just in case
+	:load-path ("~/.emacs.d/src/php-cs-fix/")
+)
+(use-package ac-php :ensure t)
+
+;; PHP settings
+;; ===============================================
+(use-package phpunit
+  :ensure t
+  :after php-mode
+  :config
+		;phpunit settings
+                (setq phpunit-root-directory "./")
+                (setq phpunit-configuration-file "./dev/tests/unit/phpunit.xml.dist")
+		(define-key php-mode-map (kbd "C-t t") 'phpunit-current-test)
+		(define-key php-mode-map (kbd "C-t c") 'phpunit-current-class)
+		(define-key php-mode-map (kbd "C-t p") 'phpunit-current-project)
+)
+
+(use-package geben
+  :ensure t
+  :after php-mode
+  :config
+		(global-set-key (kbd "<f5>") 'php-debug)
+)
+
+(use-package php-mode
+        :ensure t
+	:requires ac-php
+	:defer t
+	:config
+		(add-hook 'php-mode-hook
+				  (lambda () (add-hook 'before-save-hook #'php-cs-fixer--fix nil 'local)
+		
+		;; Enable ElDoc support (optional)
+		(ac-php-core-eldoc-setup)
+		
+		(set (make-local-variable 'company-backends)
+			 '((company-ac-php-backend company-dabbrev-code)
+			   company-capf company-files))
+		
+		(define-key php-mode-map (kbd "M-]") ac-php-find-symbol-at-point) ;; Jump to definition (optional)
+		(define-key php-mode-map (kbd "M-[") ac-php-location-stack-back)))   ;; Return back (optional)
+)
+
+(use-package flymake-php
+	:ensure t
+	:after php-mode
+	:config
+	(add-hook 'php-mode-hook 'flymake-php-load)
+)
