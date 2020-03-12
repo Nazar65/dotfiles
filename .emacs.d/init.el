@@ -70,10 +70,14 @@
 ;; Custom functions
 ;; ===============================================
 
-(defun php-debug ()
-	"Run current PHP script for debugging with geben"
-	(interactive)
-	(call-interactively 'geben))
+(defun copy-line (arg)
+      "Copy lines (as many as prefix argument) in the kill ring"
+      (interactive "p")
+      (kill-ring-save (line-beginning-position)
+                      (line-beginning-position (+ 1 arg)))
+      (message "%d line%s copied" arg (if (= 1 arg) "" "s")))
+
+(global-set-key "\C-c\C-k" 'copy-line)
 
 ;; use xclip to copy/paste in emacs-nox
 (unless window-system
@@ -347,7 +351,11 @@
   :ensure t
   :after php-mode
   :config
-		(global-set-key (kbd "<f5>") 'php-debug)
+  (setq eben-show-breakpoints-debugging-only nil)
+  (global-set-key (kbd "<f5>") 'geben)
+  (global-set-key (kbd "<f10>") 'geben-stop)
+  (global-set-key (kbd "<f12>") 'geben-set-breakpoint-line)
+
 )
 
 (use-package php-mode
@@ -363,10 +371,10 @@
 		
 		(set (make-local-variable 'company-backends)
 			 '((company-ac-php-backend company-dabbrev-code)
-			   company-capf company-files))
+			   company-capf company-files))))
 		
-		(define-key php-mode-map (kbd "M-]") ac-php-find-symbol-at-point) ;; Jump to definition (optional)
-		(define-key php-mode-map (kbd "M-[") ac-php-location-stack-back)))   ;; Return back (optional)
+		(define-key php-mode-map (kbd "C-t f") 'ac-php-find-symbol-at-point)  ;; Jump to definition (optional)
+		(define-key php-mode-map (kbd "C-t b") 'ac-php-location-stack-back)   ;; Return back (optional)
 )
 
 (use-package flymake-php
@@ -375,3 +383,7 @@
 	:config
 	(add-hook 'php-mode-hook 'flymake-php-load)
 )
+;; Magit settings
+;; ===============================================
+
+(global-set-key (kbd "C-x g") 'magit-status)
