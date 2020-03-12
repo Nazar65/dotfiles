@@ -387,3 +387,47 @@
 ;; ===============================================
 
 (global-set-key (kbd "C-x g") 'magit-status)
+
+;; Nxml settings
+;; ===============================================
+
+;; Ident xml files
+(add-hook 'hack-local-variables-hook
+   (lambda ()
+     (save-excursion
+       (goto-char (point-min))
+       (when (search-forward-regexp "^<\\?xml" 6 0)
+         (nxml-mode)
+ ))))
+
+;; set nxml line identation
+(setq nxml-child-indent 4 nxml-attribute-indent 4)
+
+;; Javascript setting
+;; ==============================================
+
+;; General javascript mode
+(use-package js2-mode
+  :ensure t
+  )
+
+;; Autocomplete mode for javascript
+(use-package ac-js2
+  :ensure t
+  :after js2-mode
+  :config
+  (add-to-list 'company-backends 'ac-js2-company)
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (add-to-list 'company-backends 'ac-js2-company)
+  )
+;; Run jscs sniffer to fix edited file
+(use-package jscs
+  :ensure t
+  :config
+  (add-hook 'js2-mode-hook #'jscs-fix-run-before-save)
+  (add-hook 'js2-mode-hook
+  (lambda ()
+    (flymake-eslint-enable)))
+)
+
+
