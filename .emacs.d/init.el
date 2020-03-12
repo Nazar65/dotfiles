@@ -65,7 +65,7 @@
 ;; Define global keybindings
 (global-unset-key "\C-z")
 (global-set-key "\C-z" 'advertised-undo)
-
+(global-display-line-numbers-mode)
 
 ;; Custom functions
 ;; ===============================================
@@ -136,14 +136,6 @@
 
 ; Make bindings that stick around.
 (use-package hydra :ensure t :defer 0.1)
-
-; Treat undo history as a tree
-(use-package undo-tree
-	:ensure t
-	:defer 0.1
-	:diminish
-	:config
-		(global-set-key (kbd "C-?") 'undo-tree-redo))
 
 ; The long lost Emacs string manipulation library.
 (use-package s
@@ -411,6 +403,12 @@
   :ensure t
   )
 
+;; Eslint flymake code sniffer
+(use-package flymake-eslint
+  :ensure t
+  :after js2-mode
+  )
+
 ;; Autocomplete mode for javascript
 (use-package ac-js2
   :ensure t
@@ -423,11 +421,12 @@
 ;; Run jscs sniffer to fix edited file
 (use-package jscs
   :ensure t
+  :after flymake-eslint
+  :requires flymake-eslint
   :config
   (add-hook 'js2-mode-hook #'jscs-fix-run-before-save)
   (add-hook 'js2-mode-hook
   (lambda ()
     (flymake-eslint-enable)))
 )
-
 
