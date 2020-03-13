@@ -339,6 +339,14 @@
 		(define-key php-mode-map (kbd "C-t p") 'phpunit-current-project)
 )
 
+;; Use projectile to oprn files on debug mode
+(use-package geben-helm-projectile
+  :ensure t
+  :after geben
+  :config
+  (define-key geben-mode-map (kbd "C-t o") 'geben-helm-projectile-open-file)
+)
+
 (use-package geben
   :ensure t
   :after php-mode
@@ -347,7 +355,6 @@
   (global-set-key (kbd "<f5>") 'geben)
   (global-set-key (kbd "<f10>") 'geben-stop)
   (global-set-key (kbd "<f12>") 'geben-set-breakpoint-line)
-
 )
 
 (use-package php-mode
@@ -356,15 +363,15 @@
 	:defer t
 	:config
 		(add-hook 'php-mode-hook
-				  (lambda () (add-hook 'before-save-hook #'php-cs-fixer--fix nil 'local)
-		
-		;; Enable ElDoc support (optional)
-		(ac-php-core-eldoc-setup)
-		
-		(set (make-local-variable 'company-backends)
-			 '((company-ac-php-backend company-dabbrev-code)
-			   company-capf company-files))))
-		
+			  (lambda () (add-hook 'before-save-hook #'php-cs-fixer--fix nil 'local)
+			    ;; Enable ElDoc support (optional)
+			    (ac-php-core-eldoc-setup)
+			    (set (make-local-variable 'company-backends)
+				 '((company-ac-php-backend company-dabbrev-code)
+				   company-capf company-files))))
+		(setq whitespace-line-column 120) ;; limit line length
+		(setq whitespace-style '(face lines-tail))
+		(add-hook 'php-mode-hook 'whitespace-mode)
 		(define-key php-mode-map (kbd "C-t f") 'ac-php-find-symbol-at-point)  ;; Jump to definition (optional)
 		(define-key php-mode-map (kbd "C-t b") 'ac-php-location-stack-back)   ;; Return back (optional)
 )
