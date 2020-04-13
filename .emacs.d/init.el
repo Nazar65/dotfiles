@@ -1,4 +1,4 @@
-; -*- lexical-binding: t; -*-
+;{{ -*- lexical-binding: t; -*-
 ;; Speed up startup
 (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
 
@@ -49,6 +49,7 @@
 (setq create-lockfiles nil)
 (setq backup-directory-alist '((".*" . "~/.emacs.d/backups/")))
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/backups/" t)))
+(setq-default indent-tabs-mode nil)
 
 ; store cutomizations in custom.el file
 (setq custom-file "~/.emacs.d/custom.el")
@@ -168,7 +169,7 @@
 
 		(global-set-key (kbd "M-x") 'helm-M-x)
 		(global-set-key (kbd "M-y") 'helm-show-kill-ring)
-
+                
 		(setq helm-split-window-in-side-p t
 			  helm-M-x-fuzzy-match t
 			  helm-locate-fuzzy-match t
@@ -253,31 +254,24 @@
 
 
 ;; Dired extensions and utils
-; ----------
-; utilities and helpers for dired-hacks collection
-(use-package dired-hacks-utils
-	:ensure t
-	:after dired
-	:config
-		(bind-key "<tab>" #'dired-subtree-toggle dired-mode-map)
-		(bind-key "<backtab>" #'dired-subtree-cycle dired-mode-map))
-
-; peep at files in another window from dired buffers
-(use-package peep-dired
-	:ensure t
-	:after dired)
-
-; tree browser leveraging dired
 (use-package dired-sidebar
-	:ensure t
-	:defer t
-	:bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
-	:commands (dired-sidebar-toggle-sidebar)
-	:config
-		(setq dired-sidebar-subtree-line-prefix "__")
-		(setq dired-sidebar-width 38)
-		(setq dired-sidebar-theme 'nerd))
-
+  :ensure t
+  :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
+  :commands (dired-sidebar-toggle-sidebar)
+  :config
+  (setq dired-sidebar-subtree-line-prefix "  ")
+  (setq dired-sidebar-use-term-integration t)
+  (setq dired-sidebar-width 38)
+  ;; Icons for dired
+  (use-package all-the-icons
+    :ensure t
+    :config
+    (use-package all-the-icons-dired
+      :ensure t
+      :config
+      (setq-default tab-width 1)
+      (display-line-numbers-mode -1)
+      :hook (dired-sidebar-mode . all-the-icons-dired-mode))))
 
 ;; Global customizations
 ;; ===============================================
@@ -290,12 +284,6 @@
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
-  
-  ;; Enable custom neotree theme (all-the-icons must be installed!)
-  (doom-themes-neotree-config)
-  ;; or for treemacs users
-  (setq doom-themes-treemacs-theme "doom-one") ; use the colorful treemacs theme
-  (doom-themes-treemacs-config)
   
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
@@ -353,9 +341,7 @@
   :config
   (setq eben-show-breakpoints-debugging-only nil)
   (global-set-key (kbd "<f5>") 'geben)
-  (global-set-key (kbd "<f10>") 'geben-stop)
-  (global-set-key (kbd "<f12>") 'geben-set-breakpoint-line)
-)
+  (global-set-key (kbd "<f10>") 'geben-end))
 
 (use-package php-mode
         :ensure t
@@ -385,7 +371,11 @@
 ;; Magit settings
 ;; ===============================================
 
-(global-set-key (kbd "C-x g") 'magit-status)
+(use-package magit
+  :ensure t
+  :config
+  (global-set-key (kbd "C-x g") 'magit-status)
+)
 
 ;; Nxml settings
 ;; ===============================================
@@ -408,6 +398,8 @@
 ;; General javascript mode
 (use-package js2-mode
   :ensure t
+  :config
+  (add-hook 'php-mode-hook 'whitespace-mode)
   )
 
 ;; Eslint flymake code sniffer
@@ -437,3 +429,4 @@
     (flymake-eslint-enable)))
 )
 
+(put 'dired-find-alternate-file 'disabled nil)
