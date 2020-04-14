@@ -259,19 +259,12 @@
   :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
   :commands (dired-sidebar-toggle-sidebar)
   :config
+  (add-hook 'dired-sidebar-mode-hook
+            (lambda () (display-line-numbers-mode -1)))
+  (setq dired-sidebar-theme 'nerd)
   (setq dired-sidebar-subtree-line-prefix "  ")
   (setq dired-sidebar-use-term-integration t)
-  (setq dired-sidebar-width 38)
-  ;; Icons for dired
-  (use-package all-the-icons
-    :ensure t
-    :config
-    (use-package all-the-icons-dired
-      :ensure t
-      :config
-      (setq-default tab-width 1)
-      (display-line-numbers-mode -1)
-      :hook (dired-sidebar-mode . all-the-icons-dired-mode))))
+  (setq dired-sidebar-width 38))
 
 ;; Global customizations
 ;; ===============================================
@@ -284,14 +277,20 @@
 
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
-  
+
+  (use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-icon t
+        doom-modeline-major-mode-icon t
+        doom-modeline-buffer-state-icon t
+        doom-modeline-buffer-modification-icon t
+        doom-modeline-vcs-max-length 50
+        doom-modeline-project-detection 'project))
+
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
-
-(use-package powerline
-  :ensure t
-  :config
-  (powerline-default-theme))
 
 ;; Global programming packages
 ;; ===============================================
@@ -332,14 +331,15 @@
   :ensure t
   :after geben
   :config
-  (define-key geben-mode-map (kbd "C-t o") 'geben-helm-projectile-open-file)
-)
+  (define-key geben-mode-map (kbd "C-t o") 'geben-helm-projectile-open-file))
 
 (use-package geben
   :ensure t
   :after php-mode
   :config
-  (setq eben-show-breakpoints-debugging-only nil)
+  (setq geben-pause-at-entry-line nil
+        geben-show-breakpoints-debugging-only -1)
+  (define-key php-mode-map (kbd "<f9>") 'geben-add-current-line-to-predefined-breakpoints)
   (global-set-key (kbd "<f5>") 'geben)
   (global-set-key (kbd "<f10>") 'geben-end))
 
@@ -362,12 +362,10 @@
 		(define-key php-mode-map (kbd "C-t b") 'ac-php-location-stack-back)   ;; Return back (optional)
 )
 
-(use-package flymake-php
-	:ensure t
-	:after php-mode
-	:config
-	(add-hook 'php-mode-hook 'flymake-php-load)
-)
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
 ;; Magit settings
 ;; ===============================================
 
@@ -399,14 +397,7 @@
 (use-package js2-mode
   :ensure t
   :config
-  (add-hook 'php-mode-hook 'whitespace-mode)
-  )
-
-;; Eslint flymake code sniffer
-(use-package flymake-eslint
-  :ensure t
-  :after js2-mode
-  )
+  (add-hook 'php-mode-hook 'whitespace-mode))
 
 ;; Autocomplete mode for javascript
 (use-package ac-js2
@@ -420,13 +411,8 @@
 ;; Run jscs sniffer to fix edited file
 (use-package jscs
   :ensure t
-  :after flymake-eslint
-  :requires flymake-eslint
   :config
   (add-hook 'js2-mode-hook #'jscs-fix-run-before-save)
-  (add-hook 'js2-mode-hook
-  (lambda ()
-    (flymake-eslint-enable)))
-)
+  (setq flycheck-eslintrc "~/.eslintrc"))
 
 (put 'dired-find-alternate-file 'disabled nil)
