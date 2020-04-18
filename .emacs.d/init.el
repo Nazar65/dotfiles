@@ -1,5 +1,6 @@
-;{{ -*- lexical-binding: t; -*-
-;; Speed up startup
+;;; package --- Simple configuration for PHP + Js development
+;;; Commentary:
+;;; Code:
 (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
 
 (setq file-name-handler-alist nil)
@@ -62,6 +63,7 @@
 (tool-bar-mode   -1)
 (tooltip-mode    -1)
 (menu-bar-mode   -1)
+(put 'dired-find-alternate-file 'disabled nil)
 
 ;; Define global keybindings
 (global-unset-key "\C-z")
@@ -96,7 +98,7 @@
     ))
 
 ;;Move backups file to another folder
-(setq emacs-persistence-directory 
+(setq emacs-persistence-directory
   (expand-file-name "var" user-emacs-directory))
 (let ((dir (expand-file-name "backup" emacs-persistence-directory)))
   (unless (file-directory-p dir)
@@ -117,7 +119,7 @@
 ;; System packages
 ;; ===============================================
 
-; Enforce a sneaky Garbage Collection strategy 
+; Enforce a sneaky Garbage Collection strategy
 ; to minimize GC interference with the activity.
 (use-package gcmh
 	:ensure t
@@ -137,21 +139,6 @@
 
 ; Make bindings that stick around.
 (use-package hydra :ensure t :defer 0.1)
-
-; The long lost Emacs string manipulation library.
-(use-package s
-	:demand
-	:ensure t)
-
-; Modern API for working with files and directories
-(use-package f
-	:demand
-	:ensure t)
-
-; A modern list library for Emacs
-(use-package dash
-	:demand
-	:ensure t)
 
 ;; HELM - Emacs incremental completion and selection narrowing framework
 ; ----------
@@ -233,7 +220,7 @@
 		
 		(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 		(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-		(projectile-global-mode 1))
+		(projectile-mode 1))
 
 
 ;; Editor extensions
@@ -269,6 +256,7 @@
 ;; Global customizations
 ;; ===============================================
 (use-package doom-themes
+  :ensure t
   :config
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
@@ -278,7 +266,10 @@
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
 
-  (use-package doom-modeline
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+
+(use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1)
   :config
@@ -289,8 +280,6 @@
         doom-modeline-vcs-max-length 50
         doom-modeline-project-detection 'project))
 
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
 
 ;; Global programming packages
 ;; ===============================================
@@ -310,7 +299,12 @@
 	;; Just in case
 	:load-path ("~/.emacs.d/src/php-cs-fix/")
 )
-(use-package ac-php :ensure t)
+(use-package ac-php
+  :ensure t
+  :after php-mode
+  :config
+  (define-key php-mode-map (kbd "C-t f") 'ac-php-find-symbol-at-point)  ;; Jump to definition (optional)
+  (define-key php-mode-map (kbd "C-t b") 'ac-php-location-stack-back))   ;; Return back (optional)
 
 ;; PHP settings
 ;; ===============================================
@@ -345,19 +339,19 @@
 
 (use-package php-mode
         :ensure t
-	:requires ac-php
+        :after ac-php
 	:defer t
 	:config
 		(add-hook 'php-mode-hook
 			  (lambda () (add-hook 'before-save-hook #'php-cs-fixer--fix nil 'local)
 			    ;; Enable ElDoc support (optional)
 			    (ac-php-core-eldoc-setup)
+                            (company-mode t)
 			    (set (make-local-variable 'company-backends)
 				 '((company-ac-php-backend company-dabbrev-code)
 				   company-capf company-files))))
 		(setq whitespace-line-column 120) ;; limit line length
 		(setq whitespace-style '(face lines-tail))
-		(add-hook 'php-mode-hook 'whitespace-mode)
 		(define-key php-mode-map (kbd "C-t f") 'ac-php-find-symbol-at-point)  ;; Jump to definition (optional)
 		(define-key php-mode-map (kbd "C-t b") 'ac-php-location-stack-back)   ;; Return back (optional)
 )
@@ -415,4 +409,5 @@
   (add-hook 'js2-mode-hook #'jscs-fix-run-before-save)
   (setq flycheck-eslintrc "~/.eslintrc"))
 
-(put 'dired-find-alternate-file 'disabled nil)
+(provide 'init)
+;;; init.el ends here
