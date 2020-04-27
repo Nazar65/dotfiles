@@ -354,11 +354,16 @@
 
 ;; Styles section css
 ;; ===============================================
+(use-package css-mode
+  :config
+  (setq auto-mode-alist
+     (cons '("\\.css\\'" . css-mode) auto-mode-alist)))
+
 (use-package com-css-sort
   :ensure t
+  :after css-mode
   :config
   (setq com-css-sort-sort-type 'alphabetic-sort)
-  (setq com-css-sort-sort-file "~/.emacs.d/src/css/sort-order.config")
   ;; Sort attributes inside block.
   (define-key css-mode-map (kbd "C-c C-s") #'com-css-sort-attributes-block)
   ;; Sort attributes through the whole document.
