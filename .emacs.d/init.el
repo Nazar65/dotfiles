@@ -358,6 +358,7 @@
   :ensure t
   :config
   (setq com-css-sort-sort-type 'alphabetic-sort)
+  (setq com-css-sort-sort-file "~/.emacs.d/src/css/sort-order.config")
   ;; Sort attributes inside block.
   (define-key css-mode-map (kbd "C-c C-s") #'com-css-sort-attributes-block)
   ;; Sort attributes through the whole document.
