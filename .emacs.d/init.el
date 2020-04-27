@@ -223,23 +223,6 @@
 		(projectile-mode 1))
 
 
-;; Editor extensions
-(use-package crux
-	:ensure t
-	:defer 0.5
-	:diminish
-	:config
-		(global-set-key (kbd "C-k") 'crux-smart-kill-line)
-		(global-set-key (kbd "C-M-RET") 'crux-smart-open-line-above) ; need to check
-		(global-set-key (kbd "M-RET") 'crux-smart-open-line)
-		(global-set-key (kbd "C-x 4 t") 'crux-transpose-windows)
-		(global-set-key (kbd "C-c d") 'crux-duplicate-current-line-or-region)
-		(global-set-key (kbd "C-c M-d") 'crux-duplicate-and-comment-current-line-or-region)
-		(global-set-key (kbd "C-c R") 'crux-rename-file-and-buffer)
-		(global-set-key (kbd "C-c I") 'crux-find-user-init-file)
-	  )
-
-
 ;; Dired extensions and utils
 (use-package dired-sidebar
   :ensure t
@@ -374,7 +357,11 @@
 (use-package com-css-sort
   :ensure t
   :config
-  (setq com-css-sort-sort-type 'alphabetic-sort))
+  (setq com-css-sort-sort-type 'alphabetic-sort)
+  ;; Sort attributes inside block.
+  (define-key css-mode-map (kbd "C-c C-s") #'com-css-sort-attributes-block)
+  ;; Sort attributes through the whole document.
+  (define-key css-mode-map (kbd "C-c C-d") #'com-css-sort-attributes-document))
 
 ;; Nxml settings
 ;; ===============================================
