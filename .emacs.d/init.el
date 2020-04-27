@@ -369,6 +369,13 @@
   (global-set-key (kbd "C-x g") 'magit-status)
 )
 
+;; Styles section css
+;; ===============================================
+(use-package com-css-sort
+  :ensure t
+  :config
+  (setq com-css-sort-sort-type 'alphabetic-sort))
+
 ;; Nxml settings
 ;; ===============================================
 
