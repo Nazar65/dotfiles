@@ -222,6 +222,11 @@
 		(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 		(projectile-mode 1))
 
+;; Icons for dired sidebar
+(use-package vscode-icon
+  :ensure t
+  :after dired-sidebar
+  )
 
 ;; Dired extensions and utils
 (use-package dired-sidebar
@@ -233,11 +238,43 @@
             (lambda () (display-line-numbers-mode -1)))
   (setq dired-sidebar-theme 'nerd)
   (setq dired-sidebar-subtree-line-prefix "  ")
+  (setq dired-sidebar-theme 'vscode)
   (setq dired-sidebar-use-term-integration t)
   (setq dired-sidebar-width 38))
 
+
 ;; Global customizations
 ;; ===============================================
+
+;; WorkSpace manager
+(use-package eyebrowse
+  :ensure t
+  :diminish eyebrowse-mode
+  :config (progn
+            (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
+            (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
+            (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
+            (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
+            (eyebrowse-mode t)
+            (setq eyebrowse-new-workspace t)))
+
+(use-package faces
+  :defer t
+  :custom-face
+  (default ((t (:family "Dejavu Sans" :height 95))))
+  ;; workaround for old charsets
+  :config
+  (set-fontset-font "fontset-default" 'cyrillic
+                    (font-spec :registry "iso10646-1" :script 'cyrillic)))
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-height 20
+        doom-modeline-icon (display-graphic-p)
+  ))
+
 (use-package doom-themes
   :ensure t
   :config
@@ -252,20 +289,9 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1)
-  :config
-  (setq doom-modeline-icon t
-        doom-modeline-major-mode-icon t
-        doom-modeline-buffer-state-icon t
-        doom-modeline-buffer-modification-icon t
-        doom-modeline-vcs-max-length 50
-        doom-modeline-project-detection 'project))
-
-
 ;; Global programming packages
 ;; ===============================================
+
 (use-package company
   :ensure t
   :config
