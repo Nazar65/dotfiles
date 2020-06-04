@@ -277,6 +277,9 @@
 
 (use-package doom-themes
   :ensure t
+  :custom
+  (doom-themes-enable-bold nil)
+  (doom-themes-enable-italic nil)
   :config
   ;; Global settings (defaults)
   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
