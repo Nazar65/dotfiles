@@ -59,6 +59,9 @@
 ;; Define custom variables
 (defvar projectile-project-folder '("~/Projects/"))
 
+(global-linum-mode)
+(setq linum-format "%4d \u2502")
+(display-battery-mode 1)
 (scroll-bar-mode -1)
 (tool-bar-mode   -1)
 (tooltip-mode    -1)
@@ -68,7 +71,6 @@
 ;; Define global keybindings
 (global-unset-key "\C-z")
 (global-set-key "\C-z" 'advertised-undo)
-(global-display-line-numbers-mode)
 
 ;; Custom functions
 ;; ===============================================
@@ -235,7 +237,7 @@
   :commands (dired-sidebar-toggle-sidebar)
   :config
   (add-hook 'dired-sidebar-mode-hook
-            (lambda () (display-line-numbers-mode -1)))
+            (lambda () (linum-mode -1)))
   (setq dired-sidebar-theme 'nerd)
   (setq dired-sidebar-subtree-line-prefix "  ")
   (setq dired-sidebar-theme 'vscode)
@@ -363,7 +365,7 @@
 				 '((company-ac-php-backend company-dabbrev-code)
 				   company-capf company-files))))
 		(setq whitespace-line-column 120) ;; limit line length
-		(setq whitespace-style '(face lines-tail))
+                (setq whitespace-style '(face lines-tail))
 		(define-key php-mode-map (kbd "C-t f") 'ac-php-find-symbol-at-point)  ;; Jump to definition (optional)
 		(define-key php-mode-map (kbd "C-t b") 'ac-php-location-stack-back)   ;; Return back (optional)
 )
