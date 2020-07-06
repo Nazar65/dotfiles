@@ -60,6 +60,9 @@
 (defvar projectile-project-folder '("~/Projects/"))
 
 (global-linum-mode)
+(display-time-mode t)
+(setq display-time-day-and-date t)
+(setq display-time-24hr-format t)
 (setq linum-format "%4d \u2502")
 (display-battery-mode 1)
 (scroll-bar-mode -1)

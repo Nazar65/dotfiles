@@ -3,30 +3,20 @@
 #
 source ~/.bash_git
 
-# Gnome keyring settings
-if [ -n "$DESKTOP_SESSION" ];then
-    eval $(gnome-keyring-daemon --start)
-    export SSH_AUTH_SOCK
-fi
-########################
-
-export EDITOR=vim
+export EDITOR=emacs
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 export PATH=$PATH":$HOME/bash"
 export HISTCONTROL=ignoreboth
 export HISTIGNORE='history*'
 export PROMPT_COMMAND='history -a;echo -en "\e]2;";history 1|sed "s/^[ \t]*[0-9]\{1,\}  //g";echo -en "\e\\";'
-alias php='/usr/bin/php72'
-alias switch-monitor='sh ~/.monitors.sh'
-alias toggle-monitor='sh ~/.toggle-monitor.sh'
+alias switch-monitor='sh ~/.switch-monitors.sh'
 alias ls='ls --color=auto'
-alias emacs='emacs -nw'
 ######## Magento instance install command ##############################
 
-alias install-madobe24dev="php72 bin/magento setup:install --base-url=http://madobe24dev.vg --base-url-secure=https://madobe24dev.vg --use-secure-admin=1 --use-secure=1 --use-rewrites=1 --admin-use-security-key=0   --db-host=localhost --db-name=madobe24dev --db-user=root --backend-frontname=admin  --db-password=3r5465XNlika21 --admin-firstname=Magento --admin-lastname=User --admin-email=user@example.com --admin-user=admin --admin-password=123123q --language=en_US";
-alias install-magentoprs="php72 bin/magento setup:install --base-url=http://magentoprs.vg --base-url-secure=https://magentoprs.vg --use-secure-admin=0 --use-secure=0 --use-rewrites=1 --admin-use-security-key=0   --db-host=localhost --db-name=magentoprs --db-user=root --backend-frontname=admin  --db-password=3r5465XNlika21 --admin-firstname=Magento --admin-lastname=User --admin-email=user@example.com --admin-user=admin --admin-password=123123q --language=en_US";
-alias install-magento24dev="php72 bin/magento setup:install --base-url=http://magento24dev.vg --base-url-secure=https://magento24dev.vg --use-secure-admin=0 --use-secure=0 --use-rewrites=1 --admin-use-security-key=0   --db-host=localhost --db-name=magento24dev --db-user=root --backend-frontname=admin  --db-password=3r5465XNlika21 --admin-firstname=Magento --admin-lastname=User --admin-email=user@example.com --admin-user=admin --admin-password=123123q --language=en_US";
+alias install-madobe24dev="php bin/magento setup:install --base-url=http://madobe24dev.vg --base-url-secure=https://madobe24dev.vg --use-secure-admin=1 --use-secure=1 --use-rewrites=1 --admin-use-security-key=0   --db-host=localhost --db-name=madobe24dev --db-user=root --backend-frontname=admin  --db-password=3r5465XNlika21 --admin-firstname=Magento --admin-lastname=User --admin-email=user@example.com --admin-user=admin --admin-password=123123q --language=en_US";
+alias install-magentoprs="php bin/magento setup:install --base-url=http://magentoprs.vg --base-url-secure=https://magentoprs.vg --use-secure-admin=0 --use-secure=0 --use-rewrites=1 --admin-use-security-key=0   --db-host=localhost --db-name=magentoprs --db-user=root --backend-frontname=admin  --db-password=3r5465XNlika21 --admin-firstname=Magento --admin-lastname=User --admin-email=user@example.com --admin-user=admin --admin-password=123123q --language=en_US";
+alias install-magento24dev="php bin/magento setup:install --base-url=http://magento24dev.vg --base-url-secure=https://magento24dev.vg --use-secure-admin=0 --use-secure=0 --use-rewrites=1 --admin-use-security-key=0   --db-host=localhost --db-name=magento24dev --db-user=root --backend-frontname=admin  --db-password=3r5465XNlika21 --admin-firstname=Magento --admin-lastname=User --admin-email=user@example.com --admin-user=admin --admin-password=123123q --language=en_US";
 
 #######################################################################
 
