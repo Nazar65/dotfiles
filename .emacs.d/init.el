@@ -227,12 +227,6 @@
 		(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 		(projectile-mode 1))
 
-;; Icons for dired sidebar
-(use-package vscode-icon
-  :ensure t
-  :after dired-sidebar
-  )
-
 ;; Dired extensions and utils
 (use-package dired-sidebar
   :ensure t
@@ -243,7 +237,6 @@
             (lambda () (linum-mode -1)))
   (setq dired-sidebar-theme 'nerd)
   (setq dired-sidebar-subtree-line-prefix "  ")
-  (setq dired-sidebar-theme 'vscode)
   (setq dired-sidebar-use-term-integration t)
   (setq dired-sidebar-width 38))
 
