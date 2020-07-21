@@ -236,10 +236,16 @@
   (add-hook 'dired-sidebar-mode-hook
             (lambda () (linum-mode -1)))
   (setq dired-sidebar-theme 'nerd)
+  (setq dired-sidebar-theme 'vscode)
   (setq dired-sidebar-subtree-line-prefix "  ")
   (setq dired-sidebar-use-term-integration t)
   (setq dired-sidebar-width 38))
 
+;; Icons for dired sidebar
+(use-package vscode-icon
+  :ensure t
+  :after dired-sidebar
+  )
 
 ;; Global customizations
 ;; ===============================================
