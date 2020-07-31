@@ -64,6 +64,7 @@
 (setq display-time-day-and-date t)
 (setq display-time-24hr-format t)
 (setq linum-format "%4d \u2502")
+(setq-default show-trailing-whitespace t)
 (display-battery-mode 1)
 (scroll-bar-mode -1)
 (tool-bar-mode   -1)
@@ -161,7 +162,7 @@
 
 		(global-set-key (kbd "M-x") 'helm-M-x)
 		(global-set-key (kbd "M-y") 'helm-show-kill-ring)
-                
+
 		(setq helm-split-window-in-side-p t
 			  helm-M-x-fuzzy-match t
 			  helm-locate-fuzzy-match t
@@ -222,7 +223,7 @@
 			  projectile-mode-line-prefix " - "
 			  projectile-tags-command "ctags -R -e --languages=php --fields=afiklmnst --file-scope=yes --format=2"
 		)
-		
+
 		(define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
 		(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 		(projectile-mode 1))
@@ -262,14 +263,6 @@
             (eyebrowse-mode t)
             (setq eyebrowse-new-workspace t)))
 
-(use-package faces
-  :defer t
-  :custom-face
-  (default ((t (:family "Dejavu Sans" :height 95))))
-  ;; workaround for old charsets
-  :config
-  (set-fontset-font "fontset-default" 'cyrillic
-                    (font-spec :registry "iso10646-1" :script 'cyrillic)))
 
 (use-package doom-modeline
   :ensure t
@@ -281,23 +274,15 @@
 
 (use-package doom-themes
   :ensure t
-  :custom
-  (doom-themes-enable-bold nil)
-  (doom-themes-enable-italic nil)
   :config
   ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
   (load-theme 'doom-one t)
-
   ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
+  (doom-themes-visual-bell-config))
 
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
 
-;; Global programming packages
-;; ===============================================
+(set-frame-font
+ "-SRC-Hack-normal-normal-normal-*-13-*-*-*-c-*-iso10646-1")
 
 (use-package company
   :ensure t
@@ -311,7 +296,8 @@
 (use-package php-cs-fixer
 	:ensure t
 	:after php-mode
-	:config
+        :config
+
 	;; Just in case
 	:load-path ("~/.emacs.d/src/php-cs-fix/")
 )
@@ -359,7 +345,9 @@
 	:defer t
 	:config
 		(add-hook 'php-mode-hook
-			  (lambda () (add-hook 'before-save-hook #'php-cs-fixer--fix nil 'local)
+			  (lambda ()
+                            (add-hook 'before-save-hook 'php-cs-fixer-before-save)
+                            (add-hook 'before-save-hook 'delete-trailing-whitespace)
 			    ;; Enable ElDoc support (optional)
 			    (ac-php-core-eldoc-setup)
                             (company-mode t)
@@ -368,6 +356,9 @@
 				   company-capf company-files))))
 		(setq whitespace-line-column 120) ;; limit line length
                 (setq whitespace-style '(face lines-tail))
+                (setq php-cs-fixer-rules-level-part-options (quote ("@PSR2")))
+                (setq php-cs-fixer-rules-fixer-part-options
+                  (quote("no_multiline_whitespace_before_semicolons" "concat_space" "no_unused_imports")))
 		(define-key php-mode-map (kbd "C-t f") 'ac-php-find-symbol-at-point)  ;; Jump to definition (optional)
 		(define-key php-mode-map (kbd "C-t b") 'ac-php-location-stack-back)   ;; Return back (optional)
 )
