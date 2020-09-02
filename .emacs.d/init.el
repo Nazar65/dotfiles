@@ -37,6 +37,13 @@
 (eval-when-compile
   (require 'use-package))
 
+;; emacs window meneger setup
+(require 'exwm)
+(require 'exwm-config)
+(exwm-config-example)
+(require 'exwm-systemtray)
+(exwm-systemtray-enable)
+
 (put 'use-package 'lisp-indent-function 1)
 
 (use-package use-package-core
@@ -64,7 +71,6 @@
 (setq display-time-day-and-date t)
 (setq display-time-24hr-format t)
 (setq linum-format "%4d \u2502")
-(setq-default show-trailing-whitespace t)
 (display-battery-mode 1)
 (scroll-bar-mode -1)
 (tool-bar-mode   -1)
@@ -78,15 +84,6 @@
 
 ;; Custom functions
 ;; ===============================================
-
-(defun copy-line (arg)
-      "Copy lines (as many as prefix argument) in the kill ring"
-      (interactive "p")
-      (kill-ring-save (line-beginning-position)
-                      (line-beginning-position (+ 1 arg)))
-      (message "%d line%s copied" arg (if (= 1 arg) "" "s")))
-
-(global-set-key "\C-c\C-k" 'copy-line)
 
 ;; use xclip to copy/paste in emacs-nox
 (unless window-system
@@ -142,9 +139,6 @@
 
 ; Hide minor modes in modeline
 (use-package diminish :ensure t :defer 0.1)
-
-; Make bindings that stick around.
-(use-package hydra :ensure t :defer 0.1)
 
 ;; HELM - Emacs incremental completion and selection narrowing framework
 ; ----------
@@ -251,26 +245,15 @@
 ;; Global customizations
 ;; ===============================================
 
-;; WorkSpace manager
-(use-package eyebrowse
-  :ensure t
-  :diminish eyebrowse-mode
-  :config (progn
-            (define-key eyebrowse-mode-map (kbd "M-1") 'eyebrowse-switch-to-window-config-1)
-            (define-key eyebrowse-mode-map (kbd "M-2") 'eyebrowse-switch-to-window-config-2)
-            (define-key eyebrowse-mode-map (kbd "M-3") 'eyebrowse-switch-to-window-config-3)
-            (define-key eyebrowse-mode-map (kbd "M-4") 'eyebrowse-switch-to-window-config-4)
-            (eyebrowse-mode t)
-            (setq eyebrowse-new-workspace t)))
+;; An atom-one-dark theme for smart-mode-line
+(use-package smart-mode-line-atom-one-dark-theme
+  :ensure t)
 
-
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1)
+;; smart-mode-line
+(use-package smart-mode-line
   :config
-  (setq doom-modeline-height 20
-        doom-modeline-icon (display-graphic-p)
-  ))
+  (setq sml/theme 'atom-one-dark)
+  (sml/setup))
 
 (use-package doom-themes
   :ensure t
@@ -301,6 +284,8 @@
 	;; Just in case
 	:load-path ("~/.emacs.d/src/php-cs-fix/")
 )
+
+
 (use-package ac-php
   :ensure t
   :after php-mode
@@ -322,16 +307,10 @@
 		(define-key php-mode-map (kbd "C-t p") 'phpunit-current-project)
 )
 
-;; Use projectile to oprn files on debug mode
-(use-package geben-helm-projectile
-  :ensure t
-  :after geben
-  :config
-  (define-key geben-mode-map (kbd "C-t o") 'geben-helm-projectile-open-file))
 
 (use-package geben
-  :ensure t
   :after php-mode
+  :load-path ("~/.emacs.d/src/geben/")
   :config
   (setq geben-pause-at-entry-line nil
         geben-show-breakpoints-debugging-only -1)
@@ -356,9 +335,10 @@
 				   company-capf company-files))))
 		(setq whitespace-line-column 120) ;; limit line length
                 (setq whitespace-style '(face lines-tail))
+                (setq-default show-trailing-whitespace t)
                 (setq php-cs-fixer-rules-level-part-options (quote ("@PSR2")))
                 (setq php-cs-fixer-rules-fixer-part-options
-                  (quote("no_multiline_whitespace_before_semicolons" "concat_space" "no_unused_imports")))
+                  (quote("no_multiline_whitespace_before_semicolons" "no_unused_imports")))
 		(define-key php-mode-map (kbd "C-t f") 'ac-php-find-symbol-at-point)  ;; Jump to definition (optional)
 		(define-key php-mode-map (kbd "C-t b") 'ac-php-location-stack-back)   ;; Return back (optional)
 )
