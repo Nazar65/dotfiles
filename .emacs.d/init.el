@@ -64,7 +64,7 @@
 (when (file-exists-p custom-file) (load custom-file))
 
 ;; Define custom variables
-(defvar projectile-project-folder '("~/Projects/"))
+(defvar projectile-project-folder '("~/Projects/i4/"))
 
 (global-linum-mode)
 (display-time-mode t)
@@ -171,20 +171,12 @@
 		(require 'helm-config)
 		(helm-mode 1))
 
-; A helm frontend for describe-bindings.
-(use-package helm-descbinds
-	:ensure t
-	:defer 0.2
-	:after helm
-	:bind(("<f1> b" . helm-descbinds))
+(use-package helm-rg
+  :ensure t
+  :after helm-projectile
+  :config
+  (define-key projectile-mode-map (kbd "C-c p s s") 'helm-rg)
 )
-
-;The silver searcher with helm interface
-(use-package helm-ag
-	:ensure t
-	:defer 0.2
-	:after helm)
-
 ; projectile extension for Helm
 (use-package helm-projectile
 	:ensure t
@@ -195,14 +187,6 @@
 	:commands helm-projectile
 	:config
 	(helm-projectile-on))
-
-; helm interface for describe mode
-(use-package helm-describe-modes
-	:ensure t
-	:defer 0.2
-	:after helm
-	:config
-		(global-set-key [remap describe-mode] #'helm-describe-modes))
 
 ;; Projectile mode and extensions
 (use-package projectile
@@ -307,7 +291,6 @@
 		(define-key php-mode-map (kbd "C-t p") 'phpunit-current-project)
 )
 
-
 (use-package geben
   :after php-mode
   :load-path ("~/.emacs.d/src/geben/")
@@ -318,10 +301,16 @@
   (global-set-key (kbd "<f5>") 'geben)
   (global-set-key (kbd "<f10>") 'geben-end))
 
+(use-package csv-mode
+  :ensure t
+  :config
+  :mode (("\\.[Cc][Ss][Vv]\\'" . csv-mode)
+         ("\\.[Cc][Ss][Vv]\\'" . csv-align-mode))
+)
+
 (use-package php-mode
         :ensure t
         :after ac-php
-	:defer t
 	:config
 		(add-hook 'php-mode-hook
 			  (lambda ()
